@@ -9,5 +9,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+         tiposDeHilos();
+
+    }
+
+    /**
+     * Forma más sencilla de crear un Thread
+     * Crearé una instancia de Thread directamente
+     */
+    private void tiposDeHilos() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //AQuí realizamos el proceso lento
+            }
+        }).start();
     }
 }
