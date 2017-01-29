@@ -4,15 +4,82 @@ import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * Como esta clase implementa Runnable, el main arrancará el método run()
+ */
+public class MainActivity extends AppCompatActivity implements Runnable{
 
     private int valor;
+
+    // Variables manejadoras
+    private Object pauseLock;
+    private boolean paused;
+    private boolean finished;
+
+
+    /**
+     * Constructor de la clase
+     * Inicializo las variables pero sin pasarle parámetros
+     */
+    public MainActivity() {
+        this.pauseLock = new Object();
+        this.paused = false;
+        this.finished = false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+         //tiposDeHilos();
+    }
 
-         tiposDeHilos();
+    @Override
+    public void run() {
+        while (!finished){
+            synchronized (pauseLock){
+                while (paused){
+                    try {
+                        pauseLock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+    }
+
+    // Implementació del ciclo de vida de Android
+
+    //Cuando la app está pausada: onPause
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        synchronized (pauseLock){
+            paused = true;
+        }
+    }
+
+    //Cuando se reanuda la actividad: onResume
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        synchronized (pauseLock){
+            paused = false;
+            pauseLock.notifyAll();
+        }
+    }
+
+    // Cuando se destruye la app: onDestroy
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finished = true;
     }
 
     /**
@@ -64,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
     public synchronized void incrementa(int incremento){
         this.valor+=incremento;
     }
+
+
 
     public class HiloDatos extends Thread{
         //Para que pueda manejar los datos de la ventana o Activity tenemso que pasarle
