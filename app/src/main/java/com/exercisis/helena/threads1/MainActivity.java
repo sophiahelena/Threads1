@@ -74,8 +74,6 @@ public class MainActivity extends AppCompatActivity implements Runnable{
     }
 
     // Cuando se destruye la app: onDestroy
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
